@@ -4,53 +4,107 @@ import javax.swing.JOptionPane;
 
 public class Banco {
     public static void main(String[] args) {
-        ContaBancaria x = new ContaBancaria();
-        int opcao;
 
-        x.informacoes();
+        ArmazenamentoDados x = new ArmazenamentoDados(); //Criação do "Banco de dados"
+        int opcao1;
+        
+        Gerente gerente = new Gerente("Gerente", "1234", x);
 
-        do{
-        opcao = Integer.parseInt(JOptionPane.showInputDialog(null, "[1] Sacar \n[2] Depositar \n[3] Transferir \n[4] Histórico de Transferências \n[5] Exibir Informações da conta \n[6] Sair", "MENU DE OPÇÕES", JOptionPane.QUESTION_MESSAGE));       
-        switch (opcao) {
-            case 1: //Saque
-                try{
-                    x.sacar();
-                } catch(Exception e){
-                    JOptionPane.showMessageDialog(null, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
-                }
-                break;
+        do {
+            opcao1 = Integer.parseInt(JOptionPane.showInputDialog( null, "[1] Gerente \n[2] Pessoa Física \n[3] Sair", "ESCOLHA UMA DAS ALTERNATIVAS:", JOptionPane.QUESTION_MESSAGE));
+            switch (opcao1) {
+                case 1: //Gerente
+                    if (gerente.autenticar()) {
+                        gerente.criarConta();
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Senha incorreta!");
+                    }
+                    break;
 
-            case 2: //Deposito
-                try{
-                    x.depositar();
-                } catch(Exception e){
-                    JOptionPane.showMessageDialog(null, e.getMessage(), "Aviso", JOptionPane.WARNING_MESSAGE);
-                }
-                break;
-            case 3: //Transferência
-                try{
-                    x.transferir();
-                } catch(Exception e){
-                    JOptionPane.showMessageDialog(null, e.getMessage(), "AVISO", JOptionPane.WARNING_MESSAGE);
-                }   
-                break;
-            case 4: //Histórico de transferências
-                x.historicoTransferencias();
-                break;
+                case 2: //Pessoa física
+                    String numero = JOptionPane.showInputDialog("Digite o número da sua conta: ");
+                    ContaBancaria conta = x.buscarContaPublic(numero);
 
-            case 5: //Exibir informações da conta
-                x.exibirInformacoes();
-                break;
+                    if (conta == null) {
+                        JOptionPane.showMessageDialog(null, "Conta não encontrada!");
+                        break;
+                    }
 
-            case 6: //sair
-                JOptionPane.showMessageDialog(null, "ENCERRANDO O PROGRAMA...", "FIM DO PROGRAMA", JOptionPane.INFORMATION_MESSAGE);
-                break;
+                    int opcao2;
+                    double valor;
 
-            default:
-                JOptionPane.showMessageDialog(null, "Número inválido, digite entre 1 e 4!", "Aviso",JOptionPane.WARNING_MESSAGE);
-                break;
-        }
+                    do {
+                        opcao2 = Integer.parseInt(JOptionPane.showInputDialog(
+                            "[1] Sacar \n[2] Depositar \n[3] Transferir \n[4] Histórico \n[5] Informações da conta \n[6] Sair"));
 
-    }while(opcao != 6); //Loop até o usuário digitar [6] para sair
-}
+                        switch (opcao2) {
+
+                            case 1: //Sacar
+                                try {
+                                    valor = Double.parseDouble(
+                                        JOptionPane.showInputDialog("Digite o valor do saque: ")); 
+                                        conta.sacar(valor);
+                                        } catch (ValorInvalidoException | SaldoInsuficienteException e) {
+                                        JOptionPane.showMessageDialog(null, e.getMessage());
+                                        } catch (NumberFormatException e) {
+                                    JOptionPane.showMessageDialog(null, "Digite um valor numérico válido!");
+                                }
+                                break;
+
+                            case 2: //Depositar
+                                    try {
+                                        valor = Double.parseDouble(
+                                        JOptionPane.showInputDialog("Digite o valor do depósito: "));
+                                        conta.depositar(valor);
+                                        } catch (ValorInvalidoException e) {
+                                        JOptionPane.showMessageDialog(null, e.getMessage());
+                                } catch (NumberFormatException e) {
+                                    JOptionPane.showMessageDialog(null, "Digite um valor numérico válido!");
+                                }
+                                break;
+
+                            case 3: //Transferir
+                                String destino = JOptionPane.showInputDialog("Conta destino: ");
+                                ContaBancaria cDestino = x.buscarContaPublic(destino);
+
+                                if (cDestino == null) {
+                                    JOptionPane.showMessageDialog(null, "Conta destino não encontrada!");
+                                    break;
+                                }
+
+                                valor = Double.parseDouble(JOptionPane.showInputDialog("Valor da transferência: "));
+                                x.transferir(conta.getNumeroConta(), destino, valor);
+                                break;
+
+                            case 4: //Histórico de Transferências
+                                conta.historicoTransferencias();
+                                break;
+
+                            case 5: //Informações da conta
+                                conta.exibirInformacoes();
+                                break;
+
+                            case 6: //Sair da conta
+                                break;
+
+                            default: //Opção errada
+                                JOptionPane.showMessageDialog(null, "Opção inválida!"); 
+                                break;
+                        }
+
+                    } while (opcao2 != 6);
+
+                    break;
+
+                              case 3: //Sair
+                    JOptionPane.showMessageDialog(null, "Encerrando programa...");
+                    break;
+
+                default:
+                    JOptionPane.showMessageDialog(null, "Opção inválida!");
+                    break;
+            }
+
+        } while (opcao1 != 3);  
     }
+}

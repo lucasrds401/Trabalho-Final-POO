@@ -4,19 +4,24 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 public class ContaBancaria {
-    private String titular, numeroConta;
+    private String titular, numeroConta, cpf, email, endereco;
+    private String senhagerente = "1234";
     private String[] historico = new String[50];
     private int nmHistorico = 0;
     private Double saldo;
 
-    public void informacoes(){ //Add informações da conta principal
-        this.titular = JOptionPane.showInputDialog(null, "Digite o nome do titular: ", "NOME", JOptionPane.QUESTION_MESSAGE);
-        this.numeroConta = JOptionPane.showInputDialog(null, "Digite o número da conta: ", "NÚMERO DA CONTA", JOptionPane.QUESTION_MESSAGE);
-        this.saldo = Double.parseDouble(JOptionPane.showInputDialog(null, "Digite o valor do saldo: ", "NÚMERO DA CONTA", JOptionPane.QUESTION_MESSAGE));
-    }
+    public ContaBancaria(String titular, String cpf, String email, String endereco, String numeroConta){
+        this.titular = titular;
+        this.cpf = cpf;
+        this.email = email;
+        this.endereco = endereco;
+        this.numeroConta = numeroConta;
+        this.saldo = 0.0;
 
+    }
+    
     private void validarPositivo(double valor, String operacao){ //Função para verificar se o valor é positivo
-        if(valor <= 0){
+        if(valor <= 0){ 
             throw new ValorInvalidoException("O valor da operação de " + operacao + " deve ser maior que zero!");
         }
     }
@@ -27,38 +32,22 @@ public class ContaBancaria {
         }
     }
 
-    public void sacar(){ //Método de saque
-        double valor = Double.parseDouble(JOptionPane.showInputDialog("Digite o valor do saque: "));
+    public void sacar(double valor){ //Método de saque
         validarPositivo(valor, "saque");
         validarSaldo(valor, "saque");
         this.saldo -= valor;   
-        JOptionPane.showMessageDialog(null,String.format("Saldo atual: R$%.2f", this.saldo), "OPERAÇÃO REALIZADA",JOptionPane.INFORMATION_MESSAGE
-);
+        JOptionPane.showMessageDialog(null,String.format("Saldo atual: R$%.2f", this.saldo), "OPERAÇÃO REALIZADA",JOptionPane.INFORMATION_MESSAGE);
     }
 
-    public void depositar(){ //Método de depósito
-      double valor = Double.parseDouble(JOptionPane.showInputDialog(null, "Digite o valor do depósito: ", "DEPÓSITO", JOptionPane.QUESTION_MESSAGE));
+    public void depositar(double valor){ //Método de depósito
       validarPositivo(valor, "depósito");
-
         this.saldo += valor;
         JOptionPane.showMessageDialog(null, String.format("Saldo atual: R$%.2f", this.saldo), "OPERAÇÃO REALIZADA", JOptionPane.INFORMATION_MESSAGE);
 }
 
-    public void transferir(){ //Método de Transferência
-        String ContaTransferir = JOptionPane.showInputDialog(null, "Nome do titular para transferir: ", "CONTA DESTINO", JOptionPane.QUESTION_MESSAGE);
-        double valor = Double.parseDouble(JOptionPane.showInputDialog(null, "Digite o valor da transferência: ", "TRANSFERÊNCIA", JOptionPane.QUESTION_MESSAGE)); 
-        validarPositivo(valor, "transferência");
-        validarSaldo(valor, "Transferência");
-        this.saldo -= valor;
-
-        LocalDateTime hoje = LocalDateTime.now(); // Criando a data atual
-        DateTimeFormatter format =  DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        String DateTimeFormatada = hoje.format(format);
-
-        historico[nmHistorico] = "valor: R$" + valor + "\nDestino: "+ ContaTransferir + "\nData: " + DateTimeFormatada;
+    public void registrarHistorico(String mensagem){ //Salva a mensagem no histórico
+        historico[nmHistorico] = mensagem;
         nmHistorico++;
-
-        JOptionPane.showMessageDialog(null, String.format("Transferência realizada para %s, agora seu saldo é: R$%.2f", ContaTransferir, this.saldo, "OPERAÇÃO REALIZADA", JOptionPane.INFORMATION_MESSAGE));
     }
 
     public void historicoTransferencias(){
@@ -66,7 +55,7 @@ public class ContaBancaria {
             JOptionPane.showMessageDialog(null, "Nenhuma Transferência realizada!");
         }
 
-        String mensagem = "";
+        String mensagem = ""; //Mostra uma transferência por vez
         for(int i = 0; i < nmHistorico; i++){
             mensagem = historico[i];
 
@@ -89,4 +78,58 @@ public class ContaBancaria {
     public double getSaldo() {
         return saldo;
     }
+
+    public String getCpf() {
+        return cpf;
+    }
+
+    public void setCpf(String cpf) {
+        this.cpf = cpf;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(String endereco) {
+        this.endereco = endereco;
+    }
+
+    public String getSenhagerente() {
+        return senhagerente;
+    }
+
+    public void setSenhagerente(String senhagerente) {
+        this.senhagerente = senhagerente;
+    }
+
+    public String[] getHistorico() {
+        return historico;
+    }
+
+    public void setHistorico(String[] historico) {
+        this.historico = historico;
+    }
+
+    public int getNmHistorico() {
+        return nmHistorico;
+    }
+
+    public void setNmHistorico(int nmHistorico) {
+        this.nmHistorico = nmHistorico;
+    }
+
+    public void setSaldo(Double saldo) {
+        this.saldo = saldo;
+    }
+
+    
 }
