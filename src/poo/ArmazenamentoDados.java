@@ -1,68 +1,74 @@
 package poo;
 
 import java.util.ArrayList;
-
 import javax.swing.JOptionPane;
 
 public class ArmazenamentoDados {
-    private ArrayList<ContaBancaria> contas = new ArrayList<>(); //Guarda objetos do Tipo conta bancária
-    private int numeroCt = 1900; //Gera número de conta, contando apartir do 1900
+    private ArrayList<ContaBancaria> contas = new ArrayList<>(); //Guarda as contas criadas
+    private int numeroCt = 1900; //Número da conta começam em 1900
 
-    private ContaBancaria buscarConta(String numero){
-        for(ContaBancaria c : contas){ //Procura todas as contas armazenadas
-            if(c.getNumeroConta().equals(numero)){ //Compara a conta procurada com o número informado
+    public ContaBancaria buscarConta(String numero) { //Método para buscar contas
+        for (ContaBancaria c : contas) { //"For" para todas as contas criadas
+            if (c.getNumeroConta().equals(numero)) { //Se a conta for = ao número dito
                 return c;
             }
         }
         return null;
     }
 
-  public ContaBancaria buscarContaPublic(String numeroConta){
-    return buscarConta(numeroConta); 
+    public String criarConta(String titular, String cpf, String email, String endereco) { //Método para criar conta
+        String numeroGerado = String.valueOf(numeroCt);
+        numeroCt++; //Adiciona o número da conta, começando no 1900
+
+        contas.add(new ContaBancaria(titular, cpf, email, endereco, numeroGerado)); //Cria a conta com todos
+        return numeroGerado; //Retorna o número da conta
+    }
+
+    public boolean transferir(String origemNum, String destinoNum, double valor) {//Método de transferência
+
+    ContaBancaria origem = buscarConta(origemNum);
+    ContaBancaria destino = buscarConta(destinoNum);
+
+    if (origem == null || destino == null) { //Procurta a conta de origem
+        JOptionPane.showMessageDialog(null, "Conta de origem ou destino não encontrada!");
+        return false;
+    }
+
+    if (!origem.isAtiva() || !destino.isAtiva()) {
+        JOptionPane.showMessageDialog(null, "Conta inativa!");
+        return false;
+    }
+
+    if (origem.getSaldo() < valor) {
+        JOptionPane.showMessageDialog(null, "Saldo insuficiente!");
+        return false;
+    }
+
+    
+    origem.setSaldo(origem.getSaldo() - valor);// movimentação
+    destino.setSaldo(destino.getSaldo() + valor);
+
+    origem.registrarHistorico("Transferência enviada para conta " + destinoNum +" - R$ " + String.format("%.2f", valor));
+
+    destino.registrarHistorico("Transferência recebida da conta " + origemNum +" - R$ " + String.format("%.2f", valor));
+
+    JOptionPane.showMessageDialog(null,"Transferência concluída!\n" +"Origem: " + origemNum + "\n" +"Destino: " + destinoNum + "\n" + "Valor: R$ " + String.format("%.2f", valor),"SUCESSO",JOptionPane.INFORMATION_MESSAGE);
+
+    return true;
 }
 
-    public String criarConta(String titular, String cpf, String email, String endereco){
-        String numerogerado = String.valueOf(numeroCt);
-        numeroCt++; //Cria uma nova conta bancária
-
-        contas.add(new ContaBancaria(titular, cpf, email, endereco, numerogerado)); //Cria o objeto e adiciona na lista de contas
-
-        return numerogerado; 
-    }
-
-    public boolean transferir(String origemNum, String destinoNum, double valor){ //Método de transferência
-        ContaBancaria origem = buscarConta(origemNum);
-        ContaBancaria destino = buscarConta(destinoNum);
-
-        if(origem == null || destino == null){ //Validação da conta
-            JOptionPane.showMessageDialog(null, "Conta inválida!");
-            return false;
-        }
-
-        try{
-            origem.sacar(valor); //Tenta sacar o valor da conta
-        }catch(Exception e){
-            JOptionPane.showMessageDialog(null, e.getMessage()); //Aparece se o saldo for insuficiente ou ocorrer outro erro
-            return false;
-        }
-
-        destino.setSaldo(destino.getSaldo() + valor); //Soma o saldo com o valor atual da conta
-
-        JOptionPane.showMessageDialog(null, "Transferência Concluída! \nOrigem:" + origemNum + "\nDestino: " + destinoNum + "\nValor: R$: " + valor);
-        return true;
-    }
-
-    public void listarContas(){
-        if(contas.isEmpty()){
-            JOptionPane.showMessageDialog(null, "Nenhuma conta cadastrada!"); //Quando não tiver nenhuma conta
+    public void listarContas() { //Método para mostrar contas cadastradas
+        if (contas.isEmpty()) { //Verifica se há contas cadastradas
+            JOptionPane.showMessageDialog(null, "Nenhuma conta cadastrada!");
             return;
         }
 
         String mensagem = "CONTAS CADASTRADAS\n";
-        for(ContaBancaria c : contas){
-            mensagem += "\nTitular: " + c.getTitular() + "\nConta: " + c.getNumeroConta() +"\nCPF: " + c.getCpf();
+
+        for (ContaBancaria c : contas) { //Percorre todas as contas cadastradas
+            mensagem += "\nTitular: " + c.getTitular() +"\nConta: " + c.getNumeroConta() + "\nCPF: " + c.getCpf() + "\n";
         }
 
         JOptionPane.showMessageDialog(null, mensagem);
-        }
     }
+}

@@ -5,7 +5,7 @@ public class Gerente {
     private String nome, senha;
     private ArmazenamentoDados banco;
     
-    public Gerente(String nome, String senha, ArmazenamentoDados banco){
+    public Gerente(String nome, String senha, ArmazenamentoDados banco){ //Construtor do Gerente
         this.nome = nome;
         this.senha = senha;
         this.banco = banco;
@@ -35,7 +35,7 @@ public class Gerente {
     JOptionPane.showMessageDialog(null, "Numero da Conta: " + numGerado, "CONTA CRIADA", JOptionPane.INFORMATION_MESSAGE);
     } 
     
-    public void listarContas(){
+    public void listarContas(){ //Chama o listar contas
         banco.listarContas();
     }
 
